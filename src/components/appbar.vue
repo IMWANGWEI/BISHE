@@ -15,7 +15,7 @@
 
 
             <mu-appbar title="">
-            <mu-text-field icon="search" class="appbar-search-field"  slot="right" hintText="搜索联系人或群聊"/>
+            
             <mu-icon-button icon="menu" slot="right" @click="toggle(true)"/>
             
 
