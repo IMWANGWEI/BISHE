@@ -20,6 +20,7 @@
     </ul>
 
       <mu-raised-button label="Getting Start" class="demo-raised-button" primary @click="homepage"/>
+      <mu-raised-button label="Login" class="demo-raised-button" primary @click="login"/>
 
   </div>
 </template>
@@ -35,6 +36,9 @@ export default {
   methods:{
     homepage(){
       this.$router.push('/homepage');
+    },
+    login(){
+      this.$router.push('./login')
     }
   }
 }
