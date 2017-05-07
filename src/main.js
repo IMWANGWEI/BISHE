@@ -11,8 +11,15 @@ import 'muse-ui/dist/theme-teal.css'
 
 import axios from 'axios'
 
+
+import toast from './components/toast'
+
 Vue.prototype.$http = axios
+
 Vue.use(MuseUI)
+
+Vue.component('toast', toast)
+
 Vue.config.productionTip = false
 
 /* eslint-disable no-new */

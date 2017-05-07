@@ -6,40 +6,109 @@
     <mu-tab value="tab3" icon="search"/>
   </mu-tabs>
   <div v-if="activeTab === 'tab1'">
-     <contacts></contacts>
+     <mu-list>
+        <mu-list-item v-for="item in friends" :title="item.username" @click="showUserTitie(item)">
+          <div class="mu-avatar" style="width: 30px; height: 30px;" slot="leftAvatar"><div class="mu-avatar-inner"><i class="mu-icon material-icons">contacts</i> <!----> </div></div>
+          <mu-icon value="chat_bubble" slot="right"/>
+        </mu-list-item>
+     </mu-list>
   </div>
   <div v-if="activeTab === 'tab2'">
-    <!--<h2>Tab Two</h2>-->
-      <contacts></contacts>
-
+  <mu-list>
+    <mu-list-item v-for="item in rooms" :title="item.roomName" @click="showRoomTitie(item)">
+          <div class="mu-avatar" style="width: 30px; height: 30px;" slot="leftAvatar"><div class="mu-avatar-inner"><i class="mu-icon material-icons">group</i> <!----> </div></div>
+          <mu-icon value="chat_bubble" slot="right"/>
+        </mu-list-item>
+</mu-list>
   </div>
   <div v-if="activeTab === 'tab3'">
-      <mu-text-field icon="search" hintText="搜索联系人或群聊"/><br/>
+  <mu-list>
+      <mu-text-field v-model="searchInput" icon="search" hintText="搜索联系人或群聊"/><br/>
+      <mu-raised-button label="联系人" class="demo-raised-button" primary  @click="searchFriends"/>
+      <mu-raised-button label="聊天室" class="demo-raised-button" secondary @click="searchRooms" />
+      <mu-list-item v-if="s_rooms !== '' " :title="s_rooms.roomName">
+          <div class="mu-avatar" style="width: 30px; height: 30px;" slot="leftAvatar"><div class="mu-avatar-inner"><i class="mu-icon material-icons">group</i> <!----> </div></div>
+          <mu-icon value="add" slot="right"/>
+      </mu-list-item>
+      <mu-list-item v-if="s_friends !== '' " :title="s_friends.username">
+          <div class="mu-avatar" style="width: 30px; height: 30px;" slot="leftAvatar"><div class="mu-avatar-inner"><i class="mu-icon material-icons">contacts</i> <!----> </div></div>
+          <mu-icon value="add" slot="right"/>
+      </mu-list-item>
+  </mu-list>
 
   </div>
 
 
-  
+  <toast ref="tips"></toast>
 </div>
 </template>
 
 <script>
-import contacts from './contacts.vue'
 
 export default {
     name:'tags',
   data () {
     return {
+      friends:[],
+      rooms:[],
+      searchInput:'',
+      s_friends:'',
+      s_rooms:'',
       activeTab: 'tab1'
     }
   },
   methods: {
+    refShowToast(message){
+      // console.log(this.$refs.tips);
+      this.$refs.tips.showToast(message);
+    },
     handleTabChange (val) {
       this.activeTab = val
-    }
+    },
+    searchFriends(){
+      var that = this;
+      this.$http.post('/api/searchUser',{
+        username:that.searchInput,
+      }).then(function(response){
+          console.log(response.data.result)
+          if(response.data.result == "FAIL"){
+          that.refShowToast("user not exist")
+          }else if(response.data.result == "SUCCESS"){
+            that.s_friends = response.data.data;
+          }
+      })
+      .catch(function(err){
+        console.log(err);
+      });
+    },
+    searchRooms(){
+      var that = this;
+      this.$http.post('/api/searchRoom',{
+        roomName:that.searchInput,
+      }).then(function(response){
+          console.log(response.data.result)
+          if(response.data.result == "FAIL"){
+          that.refShowToast("room not exist")
+          }else if(response.data.result == "SUCCESS"){
+            that.s_rooms = response.data.room;
+          }
+      })
+      .catch(function(err){
+        console.log(err);
+      });
+    },
+    showUserTitie(item){
+      console.log(item.username)
+      this.$parent.title = item.username;
+    },
+    showRoomTitie(item){
+      console.log(item.roomName)
+      this.$parent.title = item.roomName;
+    },
   },
+  
   components:{
-      contacts
+      
   }
 }
 </script>

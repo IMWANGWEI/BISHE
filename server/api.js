@@ -14,19 +14,27 @@ router.get('/', function (req, res) {
 
 
 // 测试session
-router.get('/session', function (req, res, next) {
-    var sess = req.session
-    if (sess.views) {
-        sess.views++
-        res.setHeader('Content-Type', 'text/html')
-        res.write('<p>views: ' + sess.views + '</p>')
-        res.write('<p>expires in: ' + (sess.cookie.maxAge / 1000) + 's</p>')
-        res.end()
-    } else {
-        sess.views = 1
-        res.end('welcome to the session demo. refresh!')
-    }
-});
+// router.get('/session', function (req, res, next) {
+//     var sess = req.session
+//     if (sess.views) {
+//         sess.views++
+//         res.setHeader('Content-Type', 'text/html')
+//         res.write('<p>views: ' + sess.views + '</p>')
+//         res.write('<p>expires in: ' + (sess.cookie.maxAge / 1000) + 's</p>')
+//         res.end()
+//     } else {
+//         sess.views = 1
+//         res.end('welcome to the session demo. refresh!')
+//     }
+// });
+
+router.get('/session',function(req,res){
+    console.log(req.session)
+    res.json({
+        session:req.session
+    })
+})
+
 
 
 // 注册写入数据库
@@ -45,7 +53,7 @@ router.post('/signUp', function (req, res) {
         } else if (doc !== null) {
             res.json({
                 result: 'FAIL',
-                err: 'user already exist!'
+                msg: 'user already exist!'
             });
         } else if (doc === null) {
             user.save();
@@ -61,7 +69,7 @@ router.post('/signUp', function (req, res) {
 router.post('/signIn', function (req, res) {
     var username = req.body.username;
     var password = req.body.password;
-    User.findOne({ "username": req.body.username }, function (err, doc) {
+    User.findOne({"username":username}).populate(['rooms','friends']).exec(function(err,doc){
         if (doc == null) {
             res.json({
                 result: 'FAIL',
@@ -82,6 +90,12 @@ router.post('/signIn', function (req, res) {
 
             });
             req.session.save();
+            // var data = User.findOne({"username":username}).populate(['rooms','friends']).exec(function(err,res){
+            //     console.log(res)
+            // });
+            // User.findOne({"uid":req.session.user._uid}).populate('rooms').exec(function(err,res){
+            //     console.log(res)
+            // });
         }
     });
 });
@@ -107,16 +121,6 @@ router.get('/signOut', function (req, res) {
             msg: 'unknown error'
         })
     }
-    // if(!req.session.user){
-    // req.session = null;
-    // res.json({
-    //     result:'SUCCESS',
-    //     // msg:'user havent sign in!',
-    //     data:req.session
-    // });
-    // }else{
-    // req.session.destory();
-    // }
 });
 
 // 用户名查询
@@ -181,6 +185,8 @@ router.post('/createRoom', function (req, res) {
 
 });
 
+
+//搜索聊天室
 router.post('/searchRoom',function(req,res){
     var roomName = req.body.roomName;
     Room.findOne({"roomName":roomName}, function(err, room){

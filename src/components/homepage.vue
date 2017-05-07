@@ -1,14 +1,14 @@
 <template>
     <div>
-    <appbar></appbar>
-    <tabs></tabs>
+    <appbar ref="appbar"></appbar>
+    <tabs ref="list"></tabs>
 
   <!--<mu-raised-button class="demo-raised-button" label="选择文件">
     <input type="file" class="file-button">
   </mu-raised-button>-->
 
 <div style="float:right; width:80%; ">
-  <mu-appbar title="user" zDepth="0"  style="height:51px;">
+  <mu-appbar :title="title" zDepth=0  style="height:51px;">
     <mu-icon-menu icon="more_vert" style="height:51px;" slot="right">
       <mu-menu-item title="菜单 1"/>
       <mu-menu-item title="菜单 2"/>
@@ -55,7 +55,7 @@
 
 </div>
 
-<mu-appbar title="" zDepth="0" style="height:51px; width:80%; float:right;">
+<mu-appbar title="" zDepth=0 style="height:51px; width:80%; float:right;">
     <mu-icon-button icon="image" slot="left"/>
     <mu-icon-button icon="faces" slot="left"/>
          <mu-raised-button label="SEND" class="demo-raised-button" slot="right"/>
@@ -78,10 +78,33 @@ import tabs from './tabs.vue'
 import appbar from './appbar.vue'
 
 export default {
+  data(){
+    return{
+      title:'TITLE',
+      username:'',
+      friends:[],
+      rooms:[]
+    }
+  },
   components : {
     contacts,
     tabs,
     appbar
+  },
+  mounted: function(){
+    var that = this;
+    this.$http.get('/api/session').then(function(response){
+      console.log(response)
+      if(response.data.session.user === null){
+        that.$router.push('login')
+      }else{
+      var user = response.data.session.user;
+      that.$refs.appbar.username = user.username;
+      that.$refs.list.friends=user.friends;
+      that.$refs.list.rooms = user.rooms;
+      }
+      // console.log(that.$refs.appbar.username)
+    })
   }
 }
 </script>
