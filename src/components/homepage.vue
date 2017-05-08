@@ -19,17 +19,20 @@
   </mu-appbar>
 
 
-<mu-card>
+<mu-card style="height:460px; overflow:auto">
     <div style=" text-align:left;">
   <mu-list>
-  <mu-list-item title="文字" disabled>
+  
+  
+  <mu-list-item  disabled>
     <mu-avatar slot="left" color="deepOrange300" backgroundColor="purple500">MB</mu-avatar>
+      <mu-chip class="demo-chip">
+          default chip
+      </mu-chip>
   </mu-list-item>
-  <mu-list-item title="文字" disabled>
+  <mu-list-item  disabled>
     <mu-avatar slot="left" color="deepOrange300" backgroundColor="purple500">MB</mu-avatar>
-  </mu-list-item>
-  <mu-list-item title="文字" disabled>
-    <mu-avatar slot="left" color="deepOrange300" backgroundColor="purple500">MB</mu-avatar>
+    <mu-paper class="demo-paper" :zDepth="1" />
   </mu-list-item>
   <mu-list-item title="文字" disabled>
     <mu-avatar slot="left" color="deepOrange300" backgroundColor="purple500">MB</mu-avatar>
@@ -64,10 +67,11 @@
 
 
     
-    <div style=" width: 80%; float:right;">
-     <mu-text-field hintText="多行文本输入，默认 4行，最大6行" multiLine :rows="4" :rowsMax="9" fullWidth/><br/><br/>
+    
+     <mu-text-field style=" width: 80%; float:right;" hintText="多行文本输入，默认 4行，最大6行" multiLine :rows="5" :rowsMax="9" fullWidth/><br/><br/>
 
-    </div>
+    
+    
 
     </div>
 </template>
@@ -95,13 +99,27 @@ export default {
     var that = this;
     this.$http.get('/api/session').then(function(response){
       console.log(response)
+      var uid = response.data.session.user._id;
       if(response.data.session.user === null){
         that.$router.push('login')
       }else{
-      var user = response.data.session.user;
-      that.$refs.appbar.username = user.username;
-      that.$refs.list.friends=user.friends;
-      that.$refs.list.rooms = user.rooms;
+        that.$http.post('/api/getUser',{
+          uid:uid
+        }).then(function(response){
+          var user = response.data;
+          that.$refs.appbar.username = user.username;
+          that.$refs.list.friends=user.friends;
+          that.$refs.list.rooms = user.rooms;
+          that.$refs.list.uid = user._id;
+        })
+      // var user = response.data.session.user;
+      // that.$refs.appbar.username = user.username;
+      // that.$refs.list.friends=user.friends;
+      // that.$refs.list.rooms = user.rooms;
+      // that.$refs.list.uid = user._id;
+
+
+      ///////在这里再加个查询user
       }
       // console.log(that.$refs.appbar.username)
     })
@@ -118,5 +136,13 @@ export default {
   top: 0;
   bottom: 0;
   opacity: 0;
+}
+
+.demo-paper {
+  display: inline-block;
+  height: 100px;
+  width: 100px;
+  margin: 20px;
+  text-align: center;
 }
 </style>

@@ -6,7 +6,7 @@
     <mu-tab value="tab3" icon="search"/>
   </mu-tabs>
   <div v-if="activeTab === 'tab1'">
-     <mu-list>
+     <mu-list style="max-height:650px; overflow:auto;">
         <mu-list-item v-for="item in friends" :title="item.username" @click="showUserTitie(item)">
           <div class="mu-avatar" style="width: 30px; height: 30px;" slot="leftAvatar"><div class="mu-avatar-inner"><i class="mu-icon material-icons">contacts</i> <!----> </div></div>
           <mu-icon value="chat_bubble" slot="right"/>
@@ -15,6 +15,11 @@
   </div>
   <div v-if="activeTab === 'tab2'">
   <mu-list>
+  
+      <mu-text-field v-model="c_roomName" hintText="聊天室名称" class="demo-divider-form" style="width:100px"  />
+      
+      <mu-raised-button label="创建聊天室" class="demo-raised-button" @click="createRoom"/>
+    
     <mu-list-item v-for="item in rooms" :title="item.roomName" @click="showRoomTitie(item)">
           <div class="mu-avatar" style="width: 30px; height: 30px;" slot="leftAvatar"><div class="mu-avatar-inner"><i class="mu-icon material-icons">group</i> <!----> </div></div>
           <mu-icon value="chat_bubble" slot="right"/>
@@ -28,11 +33,14 @@
       <mu-raised-button label="聊天室" class="demo-raised-button" secondary @click="searchRooms" />
       <mu-list-item v-if="s_rooms !== '' " :title="s_rooms.roomName">
           <div class="mu-avatar" style="width: 30px; height: 30px;" slot="leftAvatar"><div class="mu-avatar-inner"><i class="mu-icon material-icons">group</i> <!----> </div></div>
-          <mu-icon value="add" slot="right"/>
+          <mu-icon-button icon="add" slot="right" @click="addRoom(s_rooms._id)"/>
       </mu-list-item>
       <mu-list-item v-if="s_friends !== '' " :title="s_friends.username">
-          <div class="mu-avatar" style="width: 30px; height: 30px;" slot="leftAvatar"><div class="mu-avatar-inner"><i class="mu-icon material-icons">contacts</i> <!----> </div></div>
-          <mu-icon value="add" slot="right"/>
+          <div class="mu-avatar" style="width: 30px; height: 30px;" slot="leftAvatar"><div class="mu-avatar-inner"><i class="mu-icon material-icons">contacts</i>
+           <!----> 
+           </div>
+           </div>
+          <mu-icon-button icon="add" slot="right" @click="addFriend(s_friends._id)"/>
       </mu-list-item>
   </mu-list>
 
@@ -49,12 +57,14 @@ export default {
     name:'tags',
   data () {
     return {
+      uid:'',
       friends:[],
       rooms:[],
       searchInput:'',
       s_friends:'',
       s_rooms:'',
-      activeTab: 'tab1'
+      c_roomName:'',
+      activeTab: 'tab1',
     }
   },
   methods: {
@@ -105,6 +115,71 @@ export default {
       console.log(item.roomName)
       this.$parent.title = item.roomName;
     },
+    addFriend(id){
+      console.log(id)
+      var that = this;
+      this.$http.post('/api/addFriend',{
+        uid:that.uid,
+        fid:id
+      }).then(function(response){
+        var res = response;
+        console.log(res);
+        if(res.data.result == "FAIL"){
+          that.refShowToast(res.data.msg);
+        }else if(res.data.result == "SUCCESS"){
+          that.refShowToast("success");
+          that.$http.post('/api/getUser',{
+            uid:that.uid
+          }).then(function(response){
+            that.friends = response.data.friends;
+            console.log(response.data)
+          })
+        }
+      })
+    },
+    addRoom(id){
+      console.log(id)
+      var that = this;
+      this.$http.post('/api/inRoom',{
+        uid:that.uid,
+        rid:id
+      }).then(function(response){
+        var res = response;
+        console.log(res);
+        if(res.data.result == "FAIL"){
+          that.refShowToast(res.data.msg);
+        }else if(res.data.result == "SUCCESS"){
+          that.refShowToast("success");
+          that.$http.post('/api/getUser',{
+            uid:that.uid
+          }).then(function(response){
+            that.rooms = response.data.rooms;
+            console.log(response.data)
+          })
+        }
+      })
+    },
+    createRoom(){
+      var that = this;
+      this.$http.post('/api/createRoom',{
+        uid:that.uid,
+        roomName:that.c_roomName
+      }).then(function(response){
+        console.log(response)
+        var res = response;
+        if(res.data.result == "FAIL"){
+          that.refShowToast(res.data.msg);
+        }else if(res.data.result == "SUCCESS"){
+          that.refShowToast("success");
+          that.$http.post('/api/getUser',{
+            uid:that.uid
+          }).then(function(response){
+            that.rooms = response.data.rooms;
+            console.log(response.data)
+          })
+        }
+      })
+    }
   },
   
   components:{

@@ -123,7 +123,19 @@ router.get('/signOut', function (req, res) {
     }
 });
 
+
+// 获得用户信息
+router.post('/getUser',function(req,res){
+    User.findById(req.body.uid).populate(['rooms','friends']).exec(function(err,doc){
+        console.log(doc)
+        if(doc){
+            res.json(doc)
+        }
+    })
+})
+
 // 用户名查询
+
 router.post('/searchUser', function (req, res) {
     User.findOne({ "username": req.body.username }, function (err, doc) {
         if (err) {
