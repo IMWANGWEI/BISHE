@@ -7,17 +7,20 @@ import router from './router'
 
 import MuseUI from 'muse-ui'
 import 'muse-ui/dist/muse-ui.css'
-import 'muse-ui/dist/theme-teal.css' 
+// import 'muse-ui/dist/theme-teal.css' 
 
 import axios from 'axios'
 
 
 import toast from './components/toast'
 
+import VueSocketio from 'vue-socket.io'
+
+
 Vue.prototype.$http = axios
 
 Vue.use(MuseUI)
-
+Vue.use(VueSocketio, 'http://localhost:3000')
 Vue.component('toast', toast)
 
 Vue.config.productionTip = false

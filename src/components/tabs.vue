@@ -1,179 +1,208 @@
 <template>
-<div style="width:20%; float:left">
-  <mu-tabs :value="activeTab" @change="handleTabChange" >
-    <mu-tab value="tab1" icon="contacts"/>
-    <mu-tab value="tab2" icon="group"/>
-    <mu-tab value="tab3" icon="search"/>
-  </mu-tabs>
-  <div v-if="activeTab === 'tab1'">
-     <mu-list style="max-height:650px; overflow:auto;">
+  <div style="width:20%; float:left">
+    <mu-tabs :value="activeTab" @change="handleTabChange">
+      <mu-tab value="tab1" icon="contacts" />
+      <mu-tab value="tab2" icon="group" />
+      <mu-tab value="tab3" icon="search" />
+    </mu-tabs>
+    <div v-if="activeTab === 'tab1'">
+      <mu-list style="max-height:650px; overflow:auto;">
         <mu-list-item v-for="item in friends" :title="item.username" @click="showUserTitie(item)">
-          <div class="mu-avatar" style="width: 30px; height: 30px;" slot="leftAvatar"><div class="mu-avatar-inner"><i class="mu-icon material-icons">contacts</i> <!----> </div></div>
-          <mu-icon value="chat_bubble" slot="right"/>
+          <div class="mu-avatar" style="width: 30px; height: 30px;" slot="leftAvatar">
+            <div class="mu-avatar-inner">
+              <i class="mu-icon material-icons" >contacts</i>
+              <!---->
+            </div>
+          </div>
+          <mu-icon value="chat_bubble"  slot="right" />
+          <!--<mu-icon value="chat_bubble" color="pinkA200" slot="right" />-->
         </mu-list-item>
-     </mu-list>
-  </div>
-  <div v-if="activeTab === 'tab2'">
-  <mu-list>
+      </mu-list>
+    </div>
+    <div v-if="activeTab === 'tab2'">
+      <mu-list>
   
-      <mu-text-field v-model="c_roomName" hintText="聊天室名称" class="demo-divider-form" style="width:100px"  />
-      
-      <mu-raised-button label="创建聊天室" class="demo-raised-button" @click="createRoom"/>
-    
-    <mu-list-item v-for="item in rooms" :title="item.roomName" @click="showRoomTitie(item)">
-          <div class="mu-avatar" style="width: 30px; height: 30px;" slot="leftAvatar"><div class="mu-avatar-inner"><i class="mu-icon material-icons">group</i> <!----> </div></div>
-          <mu-icon value="chat_bubble" slot="right"/>
+        <mu-text-field v-model="c_roomName" hintText="聊天室名称" class="demo-divider-form" style="width:100px" />
+  
+        <mu-raised-button label="创建聊天室" class="demo-raised-button" @click="createRoom" />
+  
+        <mu-list-item v-for="item in rooms" :title="item.roomName" @click="showRoomTitie(item)">
+          <div class="mu-avatar" style="width: 30px; height: 30px;" slot="leftAvatar">
+            <div class="mu-avatar-inner">
+              <i class="mu-icon material-icons">group</i>
+              <!---->
+            </div>
+          </div>
+          <mu-icon value="chat_bubble" slot="right" />
         </mu-list-item>
-</mu-list>
+      </mu-list>
+    </div>
+    <div v-if="activeTab === 'tab3'">
+      <mu-list>
+        <mu-text-field v-model="searchInput" icon="search" hintText="搜索联系人或群聊" />
+        <br/>
+        <mu-raised-button label="联系人" class="demo-raised-button" primary @click="searchFriends" />
+        <mu-raised-button label="聊天室" class="demo-raised-button" secondary @click="searchRooms" />
+        <mu-list-item v-if="s_rooms !== '' " :title="s_rooms.roomName">
+          <div class="mu-avatar" style="width: 30px; height: 30px;" slot="leftAvatar">
+            <div class="mu-avatar-inner">
+              <i class="mu-icon material-icons">group</i>
+              <!---->
+            </div>
+          </div>
+          <mu-icon-button icon="add" slot="right" @click="addRoom(s_rooms._id)" />
+        </mu-list-item>
+        <mu-list-item v-if="s_friends !== '' " :title="s_friends.username">
+          <div class="mu-avatar" style="width: 30px; height: 30px;" slot="leftAvatar">
+            <div class="mu-avatar-inner">
+              <i class="mu-icon material-icons">contacts</i>
+              <!---->
+            </div>
+          </div>
+          <mu-icon-button icon="add" slot="right" @click="addFriend(s_friends._id)" />
+        </mu-list-item>
+      </mu-list>
+  
+    </div>
+  
+    <toast ref="tips"></toast>
   </div>
-  <div v-if="activeTab === 'tab3'">
-  <mu-list>
-      <mu-text-field v-model="searchInput" icon="search" hintText="搜索联系人或群聊"/><br/>
-      <mu-raised-button label="联系人" class="demo-raised-button" primary  @click="searchFriends"/>
-      <mu-raised-button label="聊天室" class="demo-raised-button" secondary @click="searchRooms" />
-      <mu-list-item v-if="s_rooms !== '' " :title="s_rooms.roomName">
-          <div class="mu-avatar" style="width: 30px; height: 30px;" slot="leftAvatar"><div class="mu-avatar-inner"><i class="mu-icon material-icons">group</i> <!----> </div></div>
-          <mu-icon-button icon="add" slot="right" @click="addRoom(s_rooms._id)"/>
-      </mu-list-item>
-      <mu-list-item v-if="s_friends !== '' " :title="s_friends.username">
-          <div class="mu-avatar" style="width: 30px; height: 30px;" slot="leftAvatar"><div class="mu-avatar-inner"><i class="mu-icon material-icons">contacts</i>
-           <!----> 
-           </div>
-           </div>
-          <mu-icon-button icon="add" slot="right" @click="addFriend(s_friends._id)"/>
-      </mu-list-item>
-  </mu-list>
-
-  </div>
-
-
-  <toast ref="tips"></toast>
-</div>
 </template>
 
 <script>
 
 export default {
-    name:'tags',
-  data () {
+  name: 'tags',
+  data() {
     return {
-      uid:'',
-      friends:[],
-      rooms:[],
-      searchInput:'',
-      s_friends:'',
-      s_rooms:'',
-      c_roomName:'',
+      uid: '',
+      friends: [],
+      rooms: [],
+      searchInput: '',
+      s_friends: '',
+      s_rooms: '',
+      c_roomName: '',
       activeTab: 'tab1',
     }
   },
   methods: {
-    refShowToast(message){
+    refShowToast(message) {
       // console.log(this.$refs.tips);
       this.$refs.tips.showToast(message);
     },
-    handleTabChange (val) {
+    handleTabChange(val) {
       this.activeTab = val
     },
-    searchFriends(){
+    searchFriends() {
       var that = this;
-      this.$http.post('/api/searchUser',{
-        username:that.searchInput,
-      }).then(function(response){
-          console.log(response.data.result)
-          if(response.data.result == "FAIL"){
+      this.$http.post('/api/searchUser', {
+        username: that.searchInput,
+      }).then(function (response) {
+        console.log(response.data.result)
+        if (response.data.result == "FAIL") {
           that.refShowToast("user not exist")
-          }else if(response.data.result == "SUCCESS"){
-            that.s_friends = response.data.data;
-          }
+        } else if (response.data.result == "SUCCESS") {
+          that.s_friends = response.data.data;
+        }
       })
-      .catch(function(err){
-        console.log(err);
-      });
+        .catch(function (err) {
+          console.log(err);
+        });
     },
-    searchRooms(){
+    searchRooms() {
       var that = this;
-      this.$http.post('/api/searchRoom',{
-        roomName:that.searchInput,
-      }).then(function(response){
-          console.log(response.data.result)
-          if(response.data.result == "FAIL"){
+      this.$http.post('/api/searchRoom', {
+        roomName: that.searchInput,
+      }).then(function (response) {
+        console.log(response.data.result)
+        if (response.data.result == "FAIL") {
           that.refShowToast("room not exist")
-          }else if(response.data.result == "SUCCESS"){
-            that.s_rooms = response.data.room;
-          }
+        } else if (response.data.result == "SUCCESS") {
+          that.s_rooms = response.data.room;
+        }
       })
-      .catch(function(err){
-        console.log(err);
-      });
+        .catch(function (err) {
+          console.log(err);
+        });
     },
-    showUserTitie(item){
+    showUserTitie(item) {
       console.log(item.username)
+      this.$parent.msg = [];
       this.$parent.title = item.username;
+      var unread = this.$parent.unreadMsg;
+      var arr = [];
+      for(var i=0;i<unread.length;i++){
+        if(unread[i].from == item.username){
+          arr.push(unread[i]);
+        }
+      };
+      this.$parent.msg = arr;
+      
+
     },
-    showRoomTitie(item){
+    showRoomTitie(item) {
       console.log(item.roomName)
       this.$parent.title = item.roomName;
     },
-    addFriend(id){
+    addFriend(id) {
       console.log(id)
       var that = this;
-      this.$http.post('/api/addFriend',{
-        uid:that.uid,
-        fid:id
-      }).then(function(response){
+      this.$http.post('/api/addFriend', {
+        uid: that.uid,
+        fid: id
+      }).then(function (response) {
         var res = response;
         console.log(res);
-        if(res.data.result == "FAIL"){
+        if (res.data.result == "FAIL") {
           that.refShowToast(res.data.msg);
-        }else if(res.data.result == "SUCCESS"){
+        } else if (res.data.result == "SUCCESS") {
           that.refShowToast("success");
-          that.$http.post('/api/getUser',{
-            uid:that.uid
-          }).then(function(response){
+          that.$http.post('/api/getUser', {
+            uid: that.uid
+          }).then(function (response) {
             that.friends = response.data.friends;
             console.log(response.data)
           })
         }
       })
     },
-    addRoom(id){
+    addRoom(id) {
       console.log(id)
       var that = this;
-      this.$http.post('/api/inRoom',{
-        uid:that.uid,
-        rid:id
-      }).then(function(response){
+      this.$http.post('/api/inRoom', {
+        uid: that.uid,
+        rid: id
+      }).then(function (response) {
         var res = response;
         console.log(res);
-        if(res.data.result == "FAIL"){
+        if (res.data.result == "FAIL") {
           that.refShowToast(res.data.msg);
-        }else if(res.data.result == "SUCCESS"){
+        } else if (res.data.result == "SUCCESS") {
           that.refShowToast("success");
-          that.$http.post('/api/getUser',{
-            uid:that.uid
-          }).then(function(response){
+          that.$http.post('/api/getUser', {
+            uid: that.uid
+          }).then(function (response) {
             that.rooms = response.data.rooms;
             console.log(response.data)
           })
         }
       })
     },
-    createRoom(){
+    createRoom() {
       var that = this;
-      this.$http.post('/api/createRoom',{
-        uid:that.uid,
-        roomName:that.c_roomName
-      }).then(function(response){
+      this.$http.post('/api/createRoom', {
+        uid: that.uid,
+        roomName: that.c_roomName
+      }).then(function (response) {
         console.log(response)
         var res = response;
-        if(res.data.result == "FAIL"){
+        if (res.data.result == "FAIL") {
           that.refShowToast(res.data.msg);
-        }else if(res.data.result == "SUCCESS"){
+        } else if (res.data.result == "SUCCESS") {
           that.refShowToast("success");
-          that.$http.post('/api/getUser',{
-            uid:that.uid
-          }).then(function(response){
+          that.$http.post('/api/getUser', {
+            uid: that.uid
+          }).then(function (response) {
             that.rooms = response.data.rooms;
             console.log(response.data)
           })
@@ -181,9 +210,9 @@ export default {
       })
     }
   },
-  
-  components:{
-      
+
+  components: {
+
   }
 }
 </script>

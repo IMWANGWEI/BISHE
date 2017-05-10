@@ -29,12 +29,13 @@
 </template>
 
 <script>
+import io from 'socket.io-client';
 export default {
   data () {
     return {
       username:'123123',
       open: false,
-      docked: true
+      docked: true,
     }
   },
   methods: {
@@ -48,10 +49,13 @@ export default {
         console.log(response)
         if(response.data.result == "SUCCESS"){
           that.$router.push('/login')
+          // that.$parent.socket.emit('disconnect')
+          that.$parent.$socket.emit('disconnect')
         }
       })
     }
   },
+  
 }
 </script>
 

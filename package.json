@@ -17,10 +17,12 @@
     "express-session": "^1.15.2",
     "mongoose": "^4.9.6",
     "muse-ui": "^2.0.2",
+    "raw-loader": "^0.5.1",
     "socket.io": "^1.7.3",
     "vue": "^2.2.6",
     "vue-msgbox": "^0.2.14",
-    "vue-router": "^2.3.1"
+    "vue-router": "^2.3.1",
+    "vue-socket.io": "^2.1.1-a"
   },
   "devDependencies": {
     "autoprefixer": "^6.7.2",
