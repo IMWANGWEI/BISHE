@@ -2,11 +2,9 @@
   <div>
     <appbar ref="appbar"></appbar>
     <tabs ref="list"></tabs>
-  
     <!--<mu-raised-button class="demo-raised-button" label="选择文件">
-      <input type="file" class="file-button">
-    </mu-raised-button>-->
-  
+            <input type="file" class="file-button">
+          </mu-raised-button>-->
     <div style="float:right; width:80%; ">
       <mu-appbar :title="title" :zDepth="0" style="height:51px;">
         <mu-icon-menu icon="more_vert" style="height:51px;" slot="right">
@@ -17,7 +15,6 @@
           <mu-menu-item title="菜单 5" />
         </mu-icon-menu>
       </mu-appbar>
-  
       <mu-card id="card" style="height:460px; overflow:auto" :scrollTop.prop="aa()">
         <div style=" text-align:left;">
           <mu-list>
@@ -25,18 +22,13 @@
               <br>
               <mu-list-item v-if="item.i==0" :title="item.msg" disabled style="text-align:right">
                 <mu-avatar slot="right" icon="star" />
+                <mu-badge v-if="onlineUser[title]==undefined" content="!" circle secondary slot = "left">
+                </mu-badge>
               </mu-list-item>
               <mu-list-item v-else :title="item.msg" disabled>
                 <mu-avatar slot="left" icon="contacts" />
               </mu-list-item>
-              
             </div>
-            
-  
-            <!--<mu-badge content="1" class="demo-icon-badge" circle secondary>
-              <mu-icon value="notifications" />
-            </mu-badge>-->
-            <!--气泡-->
           </mu-list>
         </div>
       </mu-card>
@@ -50,7 +42,18 @@
   
     </mu-appbar>
   
-    <mu-text-field v-model="input" style=" width: 80%; float:right;" hintText="多行文本输入，默认 4行，最大6行" multiLine :rows="5" :rowsMax="9" fullWidth/>
+    <!--<div @keyup.enter="sendMsg">-->
+    <mu-text-field v-model="input" style=" width: 80%; float:right;" hintText="说点什么吧~~~" multiLine :rows="5" :rowsMax="9" fullWidth/>
+    <!--</div>-->
+  
+    <!--<div id="example-1">
+        
+        </div>-->
+    <!--<div id ="emoji-panel-container">
+        <button id ="example-3-btn">emoji</button>
+        
+      </div>-->
+  
     <br/>
     <br/>
   
@@ -62,6 +65,8 @@ import contacts from './contacts.vue'
 import tabs from './tabs.vue'
 import appbar from './appbar.vue'
 import io from 'socket.io-client';
+// import EmojiPanel from 'emoji-panel';
+// import '../../node_modules/emoji-panel/lib/emoji-panel-apple-32.css'
 
 export default {
   data() {
@@ -71,9 +76,8 @@ export default {
       msg: [],
       input: '',
       title: 'TITLE',
-      username: '',
-      friends: [],
-      rooms: [],
+      unreadUser: [],
+      onlineUser: {},
     }
   },
   sockets: {
@@ -84,30 +88,31 @@ export default {
       console.log(data)
     },
     newmessage: function (data) {
-      
       console.log(data);
       var g_msg = {
         i: 1,
-        from:data.from,
+        from: data.from,
         msg: data.msg
       }
       if (this.title == data.from) {
         this.msg.push(g_msg);
       }
-       else {
-         
+      else {
+        var that = this;
         this.unreadMsg.push(g_msg);
+        if (this.unreadUser.indexOf(data.from) < 0) {
+          this.unreadUser.push(data.from);
+        }
+        this.$refs.list.$refs.tips.showToast("你有来自" + data.from + "的信息");
       }
-
-
-      
     },
     toast: function (data) {
       this.$refs.list.$refs.tips.showToast(data);
+    },
+    online: function (map) {
+      console.log(map);
+      this.onlineUser = map
     }
-    // newEmit:function(data){
-    //   console.log(data)
-    // }
   },
   components: {
     contacts,
@@ -115,7 +120,13 @@ export default {
     appbar
   },
   mounted: function () {
-
+    //     new EmojiPanel(
+    //   document.getElementById('example-1'), {
+    //     onClick: e => {
+    //       console.log(e.index,e.unified);
+    //     }
+    //   }       //emoji
+    // );
     var that = this;
     this.$http.get('/api/session').then(function (response) {
       // console.log(response)
@@ -133,23 +144,8 @@ export default {
           that.$refs.list.rooms = user.rooms;
           that.$refs.list.uid = user._id;
           that.$socket.emit('connected', { username: user.username })
-          // var socket = io.connect('http://localhost:3000');
-          //   socket.on('news', function (data) {
-          //     console.log(data);
-          //     socket.emit('connected', { username: user.username });
-
-          //   });
         })
-        // var user = response.data.session.user;
-        // that.$refs.appbar.username = user.username;
-        // that.$refs.list.friends=user.friends;
-        // that.$refs.list.rooms = user.rooms;
-        // that.$refs.list.uid = user._id;
-
-
-        ///////在这里再加个查询user
       }
-      // console.log(that.$refs.appbar.username)
     })
   },
   methods: {
@@ -158,16 +154,18 @@ export default {
     },
     sendMsg() {
       var input = this.input;
-      // var username = this.$refs.appbar.username;
       var to = this.title;
-      this.$socket.emit('sendmsg', { to: to, msg: input })
-      var s_msg = {
-        i: 0,
-        msg: input
-      };
-      this.msg.push(s_msg);
-      // console.log(this.msg)
-      // document.getElementById('box').scrollTop = 9999;
+      if (input.length == 0) {
+        this.$refs.list.$refs.tips.showToast("发送内容不能为空！")
+      } else {
+        this.$socket.emit('sendmsg', { to: to, msg: input })
+        var s_msg = {
+          i: 0,
+          msg: input
+        };
+        this.msg.push(s_msg);
+        this.input = '';
+      }
     }
   }
 }
@@ -175,6 +173,12 @@ export default {
 
 
 <style lang="css">
+#example-1 {
+  float: left;
+  height: 300px;
+  width: 300px;
+}
+
 .file-button {
   position: absolute;
   left: 0;
