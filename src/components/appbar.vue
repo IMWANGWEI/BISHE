@@ -38,11 +38,13 @@
       <mu-icon-button icon="menu" slot="right" @click="toggle(true)" />
   
       <mu-list-item slot="left">
-        <div class="mu-avatar" style="width: 30px; height: 30px;" slot="rightAvatar">
+        <div class="mu-avatar" style="width: 30px; height: 30px;" slot="rightAvatar" color="#009688">
           <div class="mu-avatar-inner">
-            <i class="mu-icon material-icons">star</i>
-            <!---->
-          </div>
+							<!--<i class="mu-icon material-icons" >contacts</i>-->
+							<!---->
+							<mu-icon  value="star" color="#1976d2" slot="left" />
+							
+						</div>
         </div>
       </mu-list-item>
       <mu-flat-button :label="username" slot="left" />

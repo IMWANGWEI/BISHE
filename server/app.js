@@ -71,7 +71,7 @@ io.on('connection', function (socket) {
         socket.broadcast.emit('online', map);
     })
     socket.on('sendmsg', function (data) {
-        
+        if(data.sendToRoom === false){
         console.log(data)
         var id = map[data.to];
         if (id === undefined) {
@@ -84,6 +84,26 @@ io.on('connection', function (socket) {
                 msg: data.msg
             });
             console.log(data)
+        }
+        }else if(data.sendToRoom === true){
+            var roomName = data.to;
+            Room.findOne({"roomName":roomName}).populate(['roomMember']).exec(function(err,room){
+                // console.log(room);
+                var member = room.roomMember;
+                for(var i =0;i<member.length;i++){
+                    var user = member[i].username;
+                    if(map[user]){
+                        var id = map[user];
+                        socket.broadcast.to(id).emit('roommessage',{
+                            from: socket.username,
+                            to: data.to,
+                            msg:data.msg
+                        });
+                        console.log(id +"send")
+                    }
+                }
+                console.log(data)
+            })
         }
         // socket.broadcast.emit('newmessage',{
         //     from:socket.username,

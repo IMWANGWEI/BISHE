@@ -21,12 +21,14 @@
             <div id="box" v-for="item in msg">
               <br>
               <mu-list-item v-if="item.i==0" :title="item.msg" disabled style="text-align:right">
-                <mu-avatar slot="right" icon="star" />
-                <mu-badge v-if="onlineUser[title]==undefined" content="!" circle secondary slot = "left">
+                <!--<mu-avatar slot="right" icon="star" />-->
+                <mu-badge :content="item.source" slot="right" color="#009688" />
+                <mu-badge v-if="onlineUser[title]==undefined && sendToRoom ===false" content="!" circle secondary slot = "left">
                 </mu-badge>
               </mu-list-item>
               <mu-list-item v-else :title="item.msg" disabled>
-                <mu-avatar slot="left" icon="contacts" />
+                <!--<mu-avatar slot="left" icon="contacts" />-->
+                <mu-badge :content="item.source" slot="left" color="#009688" />
               </mu-list-item>
             </div>
           </mu-list>
@@ -85,13 +87,14 @@ export default {
     return {
       showPanel:false,
       unreadMsg: [],
-      scrollTop: 99999999999999999,
       msg: [],
       input: '',
       title: '选个朋友开始聊天吧~~',
       unreadUser: [],
+      unreadRoom: [],
+      unreadRoomMsg:[],
       onlineUser: {},
-      scrollHeight:'',
+      sendToRoom:false,
     }
   },
   watch:{
@@ -113,7 +116,8 @@ export default {
       var g_msg = {
         i: 1,
         from: data.from,
-        msg: data.msg
+        msg: data.msg,
+        source:data.from,
       }
       if (this.title == data.from) {
         this.msg.push(g_msg);
@@ -125,6 +129,26 @@ export default {
           this.unreadUser.push(data.from);
         }
         this.$refs.list.$refs.tips.showToast("你有来自" + data.from + "的信息");
+      }
+    },
+    roommessage:function(data){
+      console.log(data);
+      var g_msg ={
+        i:1,
+        from:data.to,
+        msg:data.msg,
+        source:data.from,
+      }
+      if(this.title == data.to){
+        this.msg.push(g_msg);
+      }
+      else{
+        var that = this;
+        this.unreadRoomMsg.push(g_msg);
+        if(this.unreadRoom.indexOf(data.to)<0){
+          this.unreadRoom.push(data.to);
+        }
+        this.$refs.list.$refs.tips.showToast("你有来自" + data.to + "的信息");
       }
     },
     toast: function (data) {
@@ -185,13 +209,15 @@ export default {
     sendMsg() {
       var input = this.input;
       var to = this.title;
+      var sendToRoom = this.sendToRoom;
       if (input.length == 0) {
         this.$refs.list.$refs.tips.showToast("发送内容不能为空！")
       } else {
-        this.$socket.emit('sendmsg', { to: to, msg: input })
+        this.$socket.emit('sendmsg', {sendToRoom:sendToRoom, to: to, msg: input })
         var s_msg = {
           i: 0,
-          msg: input
+          msg: input,
+          source:this.$refs.appbar.username
         };
         this.msg.push(s_msg);
         this.input = '';
