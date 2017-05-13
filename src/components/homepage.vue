@@ -15,7 +15,7 @@
           <mu-menu-item title="菜单 5" />
         </mu-icon-menu>
       </mu-appbar>
-      <mu-card id="card" style="height:460px; overflow:auto" :scrollTop.prop="aa()">
+      <mu-card id="card" style="height:460px; overflow:auto" >
         <div style=" text-align:left;">
           <mu-list>
             <div id="box" v-for="item in msg">
@@ -36,8 +36,20 @@
     </div>
   
     <mu-appbar title="" :zDepth="0" style="height:51px; width:80%; float:right;">
-      <mu-icon-button icon="image" slot="left" />
-      <mu-icon-button icon="faces" slot="left" />
+      <mu-icon-button  slot="left" >
+        <i class="mu-icon material-icons">
+          image
+          
+        </i>
+        <!--<input type="file" class="file-button" @change="sendImg"/>-->
+        
+      </mu-icon-button>
+      <mu-icon-button icon="faces" slot="left" @click="showPanel = !showPanel" />
+      <!--<mu-raised-button label="发送文件" class="demo-raised-button">
+        <input type="file" class="file-button"/>
+      </mu-raised-button>-->
+
+     
       <mu-raised-button @click="sendMsg" label="SEND" class="demo-raised-button" slot="right" />
   
     </mu-appbar>
@@ -46,7 +58,7 @@
     <mu-text-field v-model="input" style=" width: 80%; float:right;" hintText="说点什么吧~~~" multiLine :rows="5" :rowsMax="9" fullWidth/>
     <!--</div>-->
   
-    <!--<div id="example-1">
+    <!--<div id="example-1" v-if="showPanel">
         
         </div>-->
     <!--<div id ="emoji-panel-container">
@@ -71,13 +83,22 @@ import io from 'socket.io-client';
 export default {
   data() {
     return {
+      showPanel:false,
       unreadMsg: [],
       scrollTop: 99999999999999999,
       msg: [],
       input: '',
-      title: 'TITLE',
+      title: '选个朋友开始聊天吧~~',
       unreadUser: [],
       onlineUser: {},
+      scrollHeight:'',
+    }
+  },
+  watch:{
+    msg(){
+      this.$nextTick(() => {
+      document.getElementById('card').scrollTop = document.getElementById('card').scrollHeight
+      })
     }
   },
   sockets: {
@@ -112,6 +133,17 @@ export default {
     online: function (map) {
       console.log(map);
       this.onlineUser = map
+    },
+    newFriend:function(data){
+      var that = this;
+      this.$refs.list.$refs.tips.showToast(data);
+      this.$http.post('/api/getUser', {
+						uid: that.$refs.list.uid
+					}).then(function (response) {
+						that.$refs.list.friends = response.data.friends;
+						console.log(that.$refs.list.friends)
+					});
+
     }
   },
   components: {
@@ -127,6 +159,7 @@ export default {
     //     }
     //   }       //emoji
     // );
+    
     var that = this;
     this.$http.get('/api/session').then(function (response) {
       // console.log(response)
@@ -149,9 +182,6 @@ export default {
     })
   },
   methods: {
-    aa() {
-      return 99999999999999999;
-    },
     sendMsg() {
       var input = this.input;
       var to = this.title;
@@ -165,8 +195,13 @@ export default {
         };
         this.msg.push(s_msg);
         this.input = '';
-      }
-    }
+        
+      };
+      
+    },
+    // sendImg(){
+      
+    // }
   }
 }
 </script>
@@ -174,9 +209,12 @@ export default {
 
 <style lang="css">
 #example-1 {
-  float: left;
+  
+  left: 300px;
+  top:300px;
+  bottom:300px;
   height: 300px;
-  width: 300px;
+  width: 400px;
 }
 
 .file-button {

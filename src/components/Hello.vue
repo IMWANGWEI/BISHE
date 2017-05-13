@@ -47,7 +47,7 @@
     <mu-raised-button label="Getting Start" class="demo-raised-button" primary @click="homepage" />
     <mu-raised-button label="Login" class="demo-raised-button" primary @click="login" />
   
-    <mu-raised-button label="carbon" class="demo-raised-button" primary @click="changeTheme('carbon')" />
+    
     <br>
   
   </div>

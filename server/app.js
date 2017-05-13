@@ -57,29 +57,43 @@ io.on('connection', function (socket) {
 
     });
 
-    socket.on('disconnect', function () {
+    socket.on('disconnect', function (data) {
         console.log(socket.username + " " + "disconnect")
         delete map[socket.username];
         console.log(map)
+        socket.broadcast.emit('online', map);
 
     });
+    socket.on('v_disconnect',function(data){
+        console.log(data + " " +"disconnect")
+        delete map[socket.username];
+        console.log(map)
+        socket.broadcast.emit('online', map);
+    })
     socket.on('sendmsg', function (data) {
+        
         console.log(data)
         var id = map[data.to];
         if (id === undefined) {
             socket.emit('toast', '对方不在线!')
+            console.log("发送失败")
         } else {
             socket.broadcast.to(id).emit('newmessage', {
                 from: socket.username,
                 to: data.to,
                 msg: data.msg
-            })
+            });
+            console.log(data)
         }
         // socket.broadcast.emit('newmessage',{
         //     from:socket.username,
         //     to:data.to,
         //     msg:data.msg
         // })
+    });
+    socket.on('addFriend', function(data){
+        var id = map[data];
+        socket.broadcast.to(id).emit('newFriend',"you have new friend!")
     })
 });
 

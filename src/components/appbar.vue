@@ -26,8 +26,8 @@
           </mu-list-item>
           <!--<mu-menu-item title="帮助" leftIcon="help_outline" />
           <mu-menu-item title="退出" leftIcon="power_settings_new" @click="signOut" />-->
-          <mu-list-item title="退出">
-            <mu-icon slot="left" value="power_settings_new" @click="signOut"/>
+          <mu-list-item title="退出" @click="signOut">
+            <mu-icon slot="left" value="power_settings_new" />
           </mu-list-item>
         </mu-list>
       </mu-drawer>
@@ -61,7 +61,7 @@ import io from 'socket.io-client';
 export default {
   data() {
     return {
-      username: '123123',
+      username: '这里是用户名~~',
       open: false,
       docked: true,
       theme: '',
@@ -101,7 +101,9 @@ export default {
         if (response.data.result == "SUCCESS") {
           that.$router.push('/login')
           // that.$parent.socket.emit('disconnect')
-          that.$parent.$socket.emit('disconnect');
+          var username = that.username;
+          that.$parent.$socket.emit('v_disconnect',username);
+          console.log("disconnect")
         }
       })
     }

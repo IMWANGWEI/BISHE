@@ -8,7 +8,7 @@ import router from './router'
 import MuseUI from 'muse-ui'
 import 'muse-ui/dist/muse-ui.css'
 // import 'muse-ui/dist/theme-teal.css' 
-// import EmojiPanel from 'emoji-panel';
+import EmojiPanel from 'emoji-panel';
 
 import axios from 'axios'
 

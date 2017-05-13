@@ -170,6 +170,7 @@ export default {
 				if (res.data.result == "FAIL") {
 					that.refShowToast(res.data.msg);
 				} else if (res.data.result == "SUCCESS") {
+					that.$parent.$socket.emit('addFriend',that.s_friends.username);
 					that.refShowToast("success");
 					that.$http.post('/api/getUser', {
 						uid: that.uid
@@ -179,7 +180,8 @@ export default {
 					});
 
 				}
-			})
+			});
+			
 		},
 		addRoom(id) {
 			console.log(id)
