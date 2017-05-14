@@ -11,8 +11,8 @@ export default new Router({
   routes: [
     {
       path: '/',
-      name: 'Hello',
-      component: Hello
+      name: 'homepage',
+      component: homepage
     },
     {
       path: '/homepage',
@@ -27,6 +27,11 @@ export default new Router({
     {
       path: '*',
       redirect: '/'
-    }
+    },
+    {
+      path: '/hello',
+      name: 'Hello',
+      component: Hello
+    },
   ]
 })

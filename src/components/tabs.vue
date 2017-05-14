@@ -26,7 +26,8 @@
 		</div>
 		<div v-if="activeTab === 'tab2'">
 			<mu-list>
-				<mu-text-field v-model="c_roomName" hintText="聊天室名称" class="demo-divider-form" style="width:100px" />
+				<mu-text-field v-model="c_roomName" icon="add" hintText=" 聊天室名称" class="demo-divider-form"  />
+				<br/>
 				<mu-raised-button label="创建聊天室" class="demo-raised-button" @click="createRoom" />
 
 				<mu-list-item v-for="item in rooms" :title="item.roomName" @click="showRoomTitie(item)">
