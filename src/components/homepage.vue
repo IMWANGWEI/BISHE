@@ -15,7 +15,7 @@
           <mu-menu-item title="菜单 5" />
         </mu-icon-menu>-->
       </mu-appbar>
-      <mu-card id="card" style="height:460px; overflow:auto" >
+      <mu-card id="card" style="height:446px; overflow:auto" >
         <div style=" text-align:left;">
           <mu-list>
             <div id="box" v-for="item in msg">
@@ -57,7 +57,7 @@
     </mu-appbar>
   
     <!--<div @keyup.enter="sendMsg">-->
-    <mu-text-field v-model="input" style=" width: 65%; float:right;" hintText="说点什么吧~~~" multiLine :rows="5" :rowsMax="9" fullWidth/>
+    <mu-text-field v-model="input" style=" width: 65%; float:right;" hintText="说点什么吧~~~" multiLine :rows="6" :rowsMax="10" fullWidth/>
     <!--</div>-->
   
     <!--<div id="example-1" v-if="showPanel">
@@ -68,8 +68,7 @@
         
       </div>-->
   
-    <br/>
-    <br/>
+   
   
   </div>
 </template>
