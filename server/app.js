@@ -115,5 +115,9 @@ io.on('connection', function (socket) {
         var id = map[data];
         socket.broadcast.to(id).emit('newFriend',"you have new friend!")
     })
+    socket.on('deleteFriend', function(data){
+        var id = map[data];
+        socket.broadcast.to(id).emit('delete', "you have been delete by"+" "+data)
+    })
 });
 

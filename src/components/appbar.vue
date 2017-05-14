@@ -48,7 +48,7 @@
         </div>
       </mu-list-item>
       <mu-flat-button :label="username" slot="left" />
-      <mu-icon-button icon="expand_more" slot="left" />
+      <!--<mu-icon-button icon="expand_more" slot="left" />-->
     </mu-appbar>
   </div>
 </template>

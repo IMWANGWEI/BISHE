@@ -5,15 +5,15 @@
     <!--<mu-raised-button class="demo-raised-button" label="选择文件">
             <input type="file" class="file-button">
           </mu-raised-button>-->
-    <div style="float:right; width:80%; ">
+    <div style="float:right; width:65%; ">
       <mu-appbar :title="title" :zDepth="0" style="height:51px;">
-        <mu-icon-menu icon="more_vert" style="height:51px;" slot="right">
+        <!--<mu-icon-menu icon="more_vert" style="height:51px;" slot="right">
           <mu-menu-item title="菜单 1" />
           <mu-menu-item title="菜单 2" />
           <mu-menu-item title="菜单 3" />
           <mu-menu-item title="菜单 4" />
           <mu-menu-item title="菜单 5" />
-        </mu-icon-menu>
+        </mu-icon-menu>-->
       </mu-appbar>
       <mu-card id="card" style="height:460px; overflow:auto" >
         <div style=" text-align:left;">
@@ -23,7 +23,7 @@
               <mu-list-item v-if="item.i==0" :title="item.msg" disabled style="text-align:right">
                 <!--<mu-avatar slot="right" icon="star" />-->
                 <mu-badge :content="item.source" slot="right" color="#009688" />
-                <mu-badge v-if="onlineUser[title]==undefined && sendToRoom ===false" content="!" circle secondary slot = "left">
+                <mu-badge v-if="onlineUser[title]==undefined && sendToRoom ===false" content="X" circle secondary slot = "left">
                 </mu-badge>
               </mu-list-item>
               <mu-list-item v-else :title="item.msg" disabled>
@@ -37,7 +37,7 @@
   
     </div>
   
-    <mu-appbar title="" :zDepth="0" style="height:51px; width:80%; float:right;">
+    <mu-appbar title="" :zDepth="0" style="height:51px; width:65%; float:right;">
       <mu-icon-button  slot="left" >
         <i class="mu-icon material-icons">
           image
@@ -57,7 +57,7 @@
     </mu-appbar>
   
     <!--<div @keyup.enter="sendMsg">-->
-    <mu-text-field v-model="input" style=" width: 80%; float:right;" hintText="说点什么吧~~~" multiLine :rows="5" :rowsMax="9" fullWidth/>
+    <mu-text-field v-model="input" style=" width: 65%; float:right;" hintText="说点什么吧~~~" multiLine :rows="5" :rowsMax="9" fullWidth/>
     <!--</div>-->
   
     <!--<div id="example-1" v-if="showPanel">
@@ -165,9 +165,19 @@ export default {
 						uid: that.$refs.list.uid
 					}).then(function (response) {
 						that.$refs.list.friends = response.data.friends;
-						console.log(that.$refs.list.friends)
+						
 					});
 
+    },
+    delete:function(data){
+      var that = this;
+      this.$refs.list.$refs.tips.showToast(data);
+      this.$http.post('/api/getUser', {
+						uid: that.$refs.list.uid
+					}).then(function (response) {
+						that.$refs.list.friends = response.data.friends;
+						
+					});
     }
   },
   components: {
@@ -212,6 +222,8 @@ export default {
       var sendToRoom = this.sendToRoom;
       if (input.length == 0) {
         this.$refs.list.$refs.tips.showToast("发送内容不能为空！")
+      }else if(this.title == '选个朋友开始聊天吧~~'){
+          this.$refs.list.$refs.tips.showToast("你得先选个人啊~~");
       } else {
         this.$socket.emit('sendmsg', {sendToRoom:sendToRoom, to: to, msg: input })
         var s_msg = {

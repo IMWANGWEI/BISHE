@@ -1,5 +1,5 @@
 <template>
-	<div style="width:20%; float:left">
+	<div style="width:35%; float:left">
 		<mu-tabs :value="activeTab" @change="handleTabChange">
 			<mu-tab value="tab1" icon="contacts" />
 			<mu-tab value="tab2" icon="group" />
@@ -17,7 +17,7 @@
 							<mu-icon v-else value="star" slot="left" />
 						</div>
 					</div>
-	
+					<mu-icon value="delete" slot="after" @click="deleteFriend(item)"/>
 					<mu-icon v-if="unreadUser.indexOf(item.username) >= 0" value="chat_bubble" color="pinkA200" slot="right" />
 					<mu-icon v-else value="chat_bubble" slot="right" />
 				</mu-list-item>
@@ -39,7 +39,7 @@
 
 						</div>
 					</div>
-
+					<mu-icon value="delete" slot="after" @click="deleteRoom(item._id)"/>
 					<mu-icon v-if="unreadRoom.indexOf(item.roomName) >= 0" value="chat_bubble" color="pinkA200" slot="right" />
 					<mu-icon v-else value="chat_bubble" slot="right" />
 
@@ -224,6 +224,30 @@ export default {
 			});
 			
 		},
+		deleteFriend(item){
+			console.log(item._id);
+			var that = this;
+			this.$http.post('/api/dropFriend', {
+				uid: that.uid,
+				fid: item._id
+			}).then(function (response){
+				var res = response;
+				console.log(res.data);
+				if(res.result == "FAIL"){
+					that.refShowToast(res.data.msg);
+				}else if(res.data.result == "SUCCESS"){
+					if(that.$parent.title == item.username){that.$parent.title="选个朋友开始聊天吧~~"}
+					that.$parent.$socket.emit('deleteFriend',item.username);
+					that.refShowToast("delete success");
+					that.$http.post('/api/getUser',{
+						uid:that.uid
+					}).then(function(response){
+						that.friends = response.data.friends;
+						
+					})
+				}
+			})
+		},
 		addRoom(id) {
 			console.log(id)
 			var that = this;
@@ -244,6 +268,25 @@ export default {
 						console.log(response.data)
 					})
 				}
+			})
+		},
+		deleteRoom(id){
+			var that = this;
+			this.$http.post('/api/outRoom',{
+				uid:that.uid,
+				rid:id
+			}).then(function (response){
+				if(response.data.result == "SUCCESS"){
+					that.$parent.title="选个朋友开始聊天吧~~";
+					that.refShowToast("delete success");
+					that.$http.post('/api/getUser', {
+						uid: that.uid
+					}).then(function (response) {
+						that.rooms = response.data.rooms;
+						console.log(response.data)
+					})
+				}
+				
 			})
 		},
 		createRoom() {
