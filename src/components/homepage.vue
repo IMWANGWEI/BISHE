@@ -78,6 +78,7 @@ import contacts from './contacts.vue'
 import tabs from './tabs.vue'
 import appbar from './appbar.vue'
 import io from 'socket.io-client';
+import '../css/icon.css'
 // import EmojiPanel from 'emoji-panel';
 // import '../../node_modules/emoji-panel/lib/emoji-panel-apple-32.css'
 
