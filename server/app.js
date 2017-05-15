@@ -81,7 +81,8 @@ io.on('connection', function (socket) {
             socket.broadcast.to(id).emit('newmessage', {
                 from: socket.username,
                 to: data.to,
-                msg: data.msg
+                msg: data.msg,
+                img:data.img
             });
             console.log(data)
         }
@@ -97,12 +98,13 @@ io.on('connection', function (socket) {
                         socket.broadcast.to(id).emit('roommessage',{
                             from: socket.username,
                             to: data.to,
-                            msg:data.msg
+                            msg:data.msg,
+                            img:data.img
                         });
                         console.log(id +"send")
                     }
                 }
-                console.log(data)
+                // console.log(data)
             })
         }
         // socket.broadcast.emit('newmessage',{
