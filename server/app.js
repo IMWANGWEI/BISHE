@@ -9,7 +9,7 @@ var models = require('./models')
 var User = models.User;
 var Room = models.Room;
 var api = require('./api')
-mongoose.connect('mongodb://localhost/BISHE');
+mongoose.connect('mongodb://127.0.0.1:27017/BISHE');
 mongoose.Promise = global.Promise
 console.log("database connected!")
 
